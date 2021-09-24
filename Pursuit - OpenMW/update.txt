@@ -1,2 +1,2 @@
-reduce search radius of guards in adjacent cell
-after pursuit, guards return to starting positions after cell changed
+reduce search radius of guards in adjacent cell -> 8192 to 2048
+after pursuit, guards return to starting positions if aipackage was -1 initially
