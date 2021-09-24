@@ -1,3 +1,3 @@
-# omw_lua_mods
+# luasecret
 
 OpenMW and Morrowind lua mods
