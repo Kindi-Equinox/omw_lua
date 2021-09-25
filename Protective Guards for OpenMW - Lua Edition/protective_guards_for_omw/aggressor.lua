@@ -26,7 +26,6 @@ local function searchGuardsAdjacentCells()
     for _, door in pairs(tempTab) do
         core.sendGlobalEvent("searchGuards", {door, self.object})
     end
-    searchDone = true
 end
 
 local function selfIsHostileCheck()
