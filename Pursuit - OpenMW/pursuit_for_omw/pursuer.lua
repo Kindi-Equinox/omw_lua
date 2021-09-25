@@ -31,7 +31,7 @@ local function onInactive()
     if
         oricell ~= self.cell.name and not combatTarget and self:canMove() and
             (self.recordId:match("guard") or self.recordId:match("ordinator") or
-                (self:getEquipment()[1] and self:getEquipment()[1].recordId:match("imperial")))
+                (self:getEquipment()[1] and self:getEquipment()[1].recordId:match("imperial") and self.cell.name:match("gnisis")))
      then
         core.sendGlobalEvent("returnToCell_eqnx", {self.object, oricell, nil, oripos})
     end
