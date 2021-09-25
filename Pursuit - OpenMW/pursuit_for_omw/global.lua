@@ -88,7 +88,7 @@ local function chaseCombatTarget(data)
     if delay < 0 then
         delay = 0.1
     end
-    print(string.format("%s : delay = %f", actor.recordId, delay))
+    --print(string.format("%s : delay = %f", actor.recordId, delay))
     async:newTimerInSeconds(
         delay,
         travelToTheDoor,
