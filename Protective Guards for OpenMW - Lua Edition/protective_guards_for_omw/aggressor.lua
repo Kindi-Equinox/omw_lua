@@ -26,6 +26,7 @@ local function searchGuardsAdjacentCells()
     for _, door in pairs(tempTab) do
         core.sendGlobalEvent("searchGuards", {door, self.object})
     end
+    searchDone = true
 end
 
 local function selfIsHostileCheck()
@@ -50,7 +51,7 @@ local function selfIsHostileCheck()
             if
                 actor ~= self.object and actor.type == "NPC" and (actor.position - self.position):length() < distCheck and
                     (string.match(actor.recordId, "guard") or string.match(actor.recordId, "ordinator") or
-                        (actor:getEquipment()[1] and actor:getEquipment()[1].recordId:match("imperial") and actor.cell.name:match("Gnisis")))
+                        (actor:getEquipment()[1] and actor:getEquipment()[1].recordId:match("imperial") and self.cell.name:match("Gnisis")))
              then
 				if math.random(5) < 3 then
                 actor:sendEvent("PGFOMW_Protect", self.object)
