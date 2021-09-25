@@ -17,7 +17,7 @@ local function searchGuards(data)
     for _, actor in adjacentCellActors:ipairs() do
         if
             actor:canMove() and actor.recordId:match("guard") or actor.recordId:match("ordinator") or
-                (actor:getEquipment()[1] and actor:getEquipment()[1].recordId:match("imperial") and self.cell.name:match("Gnisis"))
+                (actor:getEquipment()[1] and actor:getEquipment()[1].recordId:match("imperial") and agg.cell.name:match("Gnisis"))
          then
             actor:addScript("pursuit_for_omw/pursuer.lua")
             actor:addScript("protective_guards_for_omw/protect.lua")
