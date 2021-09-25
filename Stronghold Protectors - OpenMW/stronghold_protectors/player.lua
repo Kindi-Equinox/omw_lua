@@ -52,21 +52,19 @@ local function onUpdate()
     end
 
     for _, actor in nearby.actors:ipairs() do
-        if actor:isValid() and actor:canMove() and (actor.position - self.position):length() < 1000 then
-            if actor ~= self.object then
-                if self:isInWeaponStance() or aggressive then
-                    uiText("The residents consider you an intruder.")
-                    actor:sendEvent("attackIntruder_strghld_protect", {self.object, ownerOfStronghold})
-                elseif not aggressive then
-                    uiText(
-                        string.format(
-                            "You have %s seconds to leave the property, before they take permanent action.",
-                            leaveTimer
-                        )
+        if actor ~= self.object and actor:isValid() and actor:canMove() and (actor.position - self.position):length() < 1000 then
+            if self:isInWeaponStance() or aggressive then
+                uiText("The residents consider you an intruder.")
+                actor:sendEvent("attackIntruder_strghld_protect", {self.object, ownerOfStronghold})
+            elseif not aggressive then
+                uiText(
+                    string.format(
+                        "You have %s seconds to leave the property, before they take permanent action.",
+                        leaveTimer
                     )
-                    if not startTimer then
-                        startTimer = true
-                    end
+                )
+                if not startTimer then
+                    startTimer = true
                 end
             end
         end
