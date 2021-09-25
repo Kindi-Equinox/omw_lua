@@ -26,24 +26,26 @@ end
 
 local function isOwnerHere()
     for _, actor in nearby.actors:ipairs() do
-        if actor:isValid() and actor.type == "NPC" and ( actor.recordId == "banden indarys" or actor.recordId == "raynasa rethan" or
-                    actor.recordId == "reynel uvirith" ) then
-				return true
+        if
+            actor:isValid() and actor.type == "NPC" and
+            (actor.recordId == "banden indarys" or actor.recordId == "raynasa rethan" or
+            actor.recordId == "reynel uvirith")
+        then
+            return true
         end
     end
-	return false
+    return false
 end
 
 local function onUpdate()
     if not checkCell(self.cell.name) then
-		timer()
-		ownerOfStronghold = nil
+        timer()
+        ownerOfStronghold = nil
         leaveTimer = 11
         aggressive = false
         startTimer = false
         return
     end
-
 
     if not isOwnerHere() then
         return
@@ -71,12 +73,13 @@ local function onUpdate()
     end
 
     if startTimer and leaveTimer == 11 then
-        timer = aux.runEveryNSeconds(
-            1,
-            function()
-                leaveTimer = leaveTimer - 1
-            end
-        )
+        timer =
+            aux.runEveryNSeconds(
+                1,
+                function()
+                    leaveTimer = leaveTimer - 1
+                end
+            )
         async:newUnsavableTimerInSeconds(
             10,
             function()

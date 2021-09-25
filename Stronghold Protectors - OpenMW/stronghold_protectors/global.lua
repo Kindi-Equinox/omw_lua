@@ -21,7 +21,7 @@ return {
                     strongholdActor = true
                     break
                 end
-				strongholdActor = false
+                strongholdActor = false
             end
 
             if not strongholdActor then
@@ -37,7 +37,7 @@ return {
         onUpdate = function()
             if not playerRef then
                 playerRef = world.selectObjects(query.actors:where(query.OBJECT.type:eq("Player")))[1]
-				playerRef:addScript("stronghold_protectors/player.lua")
+                playerRef:addScript("stronghold_protectors/player.lua")
             end
         end
     },
