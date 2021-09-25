@@ -51,7 +51,7 @@ local function selfIsHostileCheck()
             if
                 actor ~= self.object and actor.type == "NPC" and (actor.position - self.position):length() < distCheck and
                     (string.match(actor.recordId, "guard") or string.match(actor.recordId, "ordinator") or
-                        (actor:getEquipment()[1] and actor:getEquipment()[1].recordId:match("imperial")))
+                        (actor:getEquipment()[1] and actor:getEquipment()[1].recordId:match("imperial") and actor.cell.name:match("gnisis")))
              then
 				if math.random(5) < 3 then
                 actor:sendEvent("PGFOMW_Protect", self.object)
