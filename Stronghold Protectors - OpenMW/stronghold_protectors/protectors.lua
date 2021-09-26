@@ -1,9 +1,6 @@
 local self = require("openmw.self")
 local aux = require("openmw_aux.util")
-local query = require("openmw.query")
-local core = require("openmw.core")
 local nearby = require("openmw.nearby")
-local stronghold = require("stronghold_protectors.strongholds")
 local functions = require("stronghold_protectors.functions")
 local hostileToPlayer = false --changes when in stronghold only
 local playerRef
