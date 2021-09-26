@@ -2,8 +2,6 @@ local stronghold = require("stronghold_protectors.strongholds")
 local this = {}
 
 
-
-
 this.checkCellIsStronghold = function (cell)
     for _, v in pairs(stronghold) do
         if cell:match(v) then
@@ -25,15 +23,6 @@ this.isOwnerHere = function (nearby)
     end
     return false
 end
-
-
-
-
-
-
-
-
-
 
 
 
