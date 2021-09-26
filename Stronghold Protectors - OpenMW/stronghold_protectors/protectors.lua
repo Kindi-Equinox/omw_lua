@@ -1,6 +1,7 @@
 local self = require("openmw.self")
 local aux = require("openmw_aux.util")
 local nearby = require("openmw.nearby")
+local core = require('openmw.core')
 local functions = require("stronghold_protectors.functions")
 local hostileToPlayer = false --changes when in stronghold only
 local playerRef
@@ -32,6 +33,11 @@ local function onUpdate()
             actor:sendEvent("attackIntruder_strghld_protect", {self.object, playerRef})
         end
     end
+	for _, door in nearby.doors:ipairs() do
+		if functions.checkCellIsStronghold(door.destCell.name) then
+			core.sendGlobalEvent("attackIntruderOutside_strghld_protect", {self.object, door.destCell.name})
+		end
+	end
 end
 
 local function attackIntruder_strghld_protect(data)
