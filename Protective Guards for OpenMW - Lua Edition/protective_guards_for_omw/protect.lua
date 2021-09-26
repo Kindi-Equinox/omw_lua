@@ -25,5 +25,7 @@ local function attack(attacker)
 end
 
 return {
-    eventHandlers = {PGFOMW_Protect = attack}
+    eventHandlers = {
+	ProtectiveGuards_alertGuard_eqnx = attack
+	}
 }

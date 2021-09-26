@@ -17,8 +17,12 @@ local function onInactive()
 end
 
 local function onUpdate()
-    if not self:getCombatTarget() or not functions.checkCellIsStronghold(self.cell.name) or hostileToPlayer or functions.isOwnerHere(nearby) then
-        return
+    if
+	   not self:getCombatTarget() or
+	   not functions.checkCellIsStronghold(self.cell.name) or
+	   hostileToPlayer or
+	   functions.isOwnerHere(nearby) then
+	   return
     end
 
     if self:getCombatTarget().type == "Player" then
@@ -30,17 +34,17 @@ local function onUpdate()
     --if it's a renegade creature in the property or an NPC that attacks the player, all tenants of the stronghold will attack it
     for _, actor in nearby.actors:ipairs() do
         if actor ~= self.object and actor ~= self:getCombatTarget() and self:canMove() and self:isValid() and actor:isValid() and actor:canMove() and (actor.position - self.position):length() < 2048 then
-            actor:sendEvent("attackIntruder_strghld_protect", {self.object, playerRef})
+            actor:sendEvent("ProtectiveAllies_attackIntruder_eqnx", {self.object, playerRef})
         end
     end
 	for _, door in nearby.doors:ipairs() do
 		if functions.checkCellIsStronghold(door.destCell.name) then
-			core.sendGlobalEvent("attackIntruderOutside_strghld_protect", {self.object, door.destCell.name})
+			core.sendGlobalEvent("ProtectiveAllies_attackIntruderOutside_eqnx", {self.object, door.destCell.name})
 		end
 	end
 end
 
-local function attackIntruder_strghld_protect(data)
+local function ProtectiveAllies_attackIntruder_eqnx(data)
     local intruder, owner = unpack(data)
     if not self:getCombatTarget() then
         if intruder.type == "Player" then
@@ -63,6 +67,6 @@ return {
         onInactive = onInactive
     },
     eventHandlers = {
-        attackIntruder_strghld_protect = attackIntruder_strghld_protect
+        ProtectiveAllies_attackIntruder_eqnx = ProtectiveAllies_attackIntruder_eqnx
     }
 }

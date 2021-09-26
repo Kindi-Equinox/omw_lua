@@ -24,7 +24,7 @@ local function searchGuardsAdjacentCells()
         end
     end
     for _, door in pairs(tempTab) do
-        core.sendGlobalEvent("searchGuards", {door, self.object})
+        core.sendGlobalEvent("ProtectiveGuards_searchGuards_eqnx", {door, self.object})
     end
 end
 
@@ -53,7 +53,7 @@ local function selfIsHostileCheck()
                         (actor:getEquipment()[1] and actor:getEquipment()[1].recordId:match("imperial") and self.cell.name:match("Gnisis")))
              then
 				if math.random(5) < 3 then
-                actor:sendEvent("PGFOMW_Protect", self.object)
+                actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", self.object)
 				end
             end
         end

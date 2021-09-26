@@ -31,14 +31,17 @@ return {
         end
     },
     eventHandlers = {
-        pursuit_for_omw_installed = function()
+        Pursuit_installed_eqnx = function()
             pursuit_for_omw = true
             print("Pursuit and Stronghold Protectors interaction established")
         end,
-        attackIntruderOutside_strghld_protect = function(data)
+        ProtectiveAllies_attackIntruderOutside_eqnx = function(data)
+
             --people inside cell will come out to defend stronghold
             --require pursuit mod
             --for now disabled until it is possible to get aipackages
+			--will also teleport disabled actors due to engine bug #issue6302
+
             if data or not data then return end --remove this line to enable
             if not pursuit_for_omw then return end
             local intruder, cellName = unpack(data)
@@ -49,10 +52,10 @@ return {
             for _, actor in actors:ipairs() do
                 if actor.type == "NPC" and actor:canMove() and actor:isValid() then
                     actor:addScript("pursuit_for_omw/pursuer.lua")
-                    actor:sendEvent("savePos_eqnx")
+                    actor:sendEvent("Pursuit_savePos_eqnx")
                     actor:addScript("stronghold_protectors/protectors.lua")
-                    core.sendGlobalEvent("chaseCombatTarget_eqnx", {actor, intruder})
-                    actor:sendEvent("attackIntruder_strghld_protect", {intruder, playerRef})
+                    core.sendGlobalEvent("Pursuit_chaseCombatTarget_eqnx", {actor, intruder})
+                    actor:sendEvent("ProtectiveAllies_attackIntruder_eqnx", {intruder, playerRef})
                 end
             end
 

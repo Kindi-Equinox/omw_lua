@@ -21,9 +21,9 @@ local function searchGuards(data)
          then
             actor:addScript("pursuit_for_omw/pursuer.lua")
             actor:addScript("protective_guards_for_omw/protect.lua")
-            actor:sendEvent("savePos_eqnx")
-            core.sendGlobalEvent("chaseCombatTarget_eqnx", {actor, agg})
-            actor:sendEvent("PGFOMW_Protect", agg)
+            actor:sendEvent("Pursuit_savePos_eqnx")
+            core.sendGlobalEvent("Pursuit_chaseCombatTarget_eqnx", {actor, agg})
+            actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", agg)
         end
     end
 end
@@ -56,8 +56,8 @@ return {
         end
     },
     eventHandlers = {
-        searchGuards = searchGuards,
-        pursuit_for_omw_installed = function()
+        ProtectiveGuards_searchGuards_eqnx = searchGuards,
+        Pursuit_installed_eqnx = function()
             pursuit_for_omw = true
             print("Pursuit and Protective Guards interaction established")
         end

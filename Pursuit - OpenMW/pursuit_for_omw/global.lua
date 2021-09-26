@@ -126,11 +126,11 @@ return {
             end
         end,
 		onLoad = function()
-			core.sendGlobalEvent("pursuit_for_omw_installed")
+			core.sendGlobalEvent("Pursuit_installed_eqnx")
 		end
     },
     eventHandlers = {
-        chaseCombatTarget_eqnx = chaseCombatTarget,
-        returnToCell_eqnx = returnToCell
+        Pursuit_chaseCombatTarget_eqnx = chaseCombatTarget,
+        Pursuit_returnToCell_eqnx = returnToCell
     }
 }

@@ -25,7 +25,7 @@ local function onUpdate()
 	end
     combatTarget = self:getCombatTarget()
     if self:getCombatTarget().type ~= "Player" then
-        self:getCombatTarget():sendEvent("pursuers_eqnx", self.object)
+        self:getCombatTarget():sendEvent("Pursuit_pursuerData_eqnx", self.object)
     end
 end
 
@@ -36,7 +36,7 @@ local function onInactive()
             (self.recordId:match("guard") or self.recordId:match("ordinator") or
                 (self:getEquipment()[1] and self:getEquipment()[1].recordId:match("imperial")))
      then
-        core.sendGlobalEvent("returnToCell_eqnx", {self.object, oricell, nil, oripos})
+        core.sendGlobalEvent("Pursuit_returnToCell_eqnx", {self.object, oricell, nil, oripos})
     end
 end
 
@@ -64,6 +64,6 @@ return {
         end
     },
     eventHandlers = {
-        savePos_eqnx = savePos_eqnx
+        Pursuit_savePos_eqnx = savePos_eqnx
     }
 }
