@@ -22,7 +22,7 @@ local isThisPartEnabled = false
 --this part makes rival stronghold tenants hostile towards the player
 --to enable, change 'isThisPartEnabled' to true
 local function onUpdate()
-	if not isThisPartEnabled then return end
+    if not isThisPartEnabled then return end
     if not functions.checkCellIsStronghold(self.cell.name) then
         if leaveTimer ~= 11 then
             timer()
