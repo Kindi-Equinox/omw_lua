@@ -9,10 +9,20 @@ local aggressive = false
 local leaveTimer = 11
 local startTimer = false
 local timer
+local isThisPartEnabled = false
 
 
+--todo
+--check if the player is a member of rival houses
+--check if the actor is affected by certain spells
+--check if the actor is a follower
+--some other stuff
 
+
+--this part makes rival stronghold tenants hostile towards the player
+--to enable, change 'isThisPartEnabled' to true
 local function onUpdate()
+	if not isThisPartEnabled then return end
     if not functions.checkCellIsStronghold(self.cell.name) then
         if leaveTimer ~= 11 then
             timer()

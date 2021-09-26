@@ -16,19 +16,7 @@ local function onInactive()
 end
 
 local function onUpdate()
-    if not self:getCombatTarget() then
-        return
-    end
-
-    if not functions.checkCellIsStronghold(self.cell.name) then
-        return
-    end
-
-    if hostileToPlayer then
-        return
-    end
-
-    if functions.isOwnerHere(nearby) then
+    if not self:getCombatTarget() or not functions.checkCellIsStronghold(self.cell.name) or hostileToPlayer or functions.isOwnerHere(nearby) then
         return
     end
 
