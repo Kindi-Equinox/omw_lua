@@ -39,7 +39,7 @@ return {
             --people inside cell will come out to defend stronghold
             --require pursuit mod
             --for now disabled until it is possible to get aipackages
-            if data or not data then return end --remove this line to enable
+            --if data or not data then return end --remove this line to enable
             if not pursuit_for_omw then return end
             local intruder, cellName = unpack(data)
             local innerCell = world.getCellByName(cellName)
@@ -51,7 +51,7 @@ return {
                     actor:addScript("pursuit_for_omw/pursuer.lua")
                     actor:sendEvent("savePos_eqnx")
                     actor:addScript("stronghold_protectors/protectors.lua")
-                    core.sendGlobalEvent("chaseCombatTarget_eqnx", {actor, intruder, false, core.getGameTimeInSeconds()})
+                    core.sendGlobalEvent("chaseCombatTarget_eqnx", {actor, intruder})
                     actor:sendEvent("attackIntruder_strghld_protect", {intruder, playerRef})
                 end
             end

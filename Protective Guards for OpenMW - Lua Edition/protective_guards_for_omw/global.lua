@@ -22,7 +22,7 @@ local function searchGuards(data)
             actor:addScript("pursuit_for_omw/pursuer.lua")
             actor:addScript("protective_guards_for_omw/protect.lua")
             actor:sendEvent("savePos_eqnx")
-            core.sendGlobalEvent("chaseCombatTarget_eqnx", {actor, agg, false, core.getGameTimeInSeconds()})
+            core.sendGlobalEvent("chaseCombatTarget_eqnx", {actor, agg})
             actor:sendEvent("PGFOMW_Protect", agg)
         end
     end
@@ -38,7 +38,7 @@ aux.runEveryNSeconds(
 return {
     engineHandlers = {
         onActorActive = function(actor)
-            if not actor then
+            if not actor or not actor:isValid() then
                 return
             end
             actor:addScript("protective_guards_for_omw/aggressor.lua")

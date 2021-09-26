@@ -55,10 +55,14 @@ local travelToTheDoor =
     end
 )
 
+--the parameter is a table with 3 values
+--[1] the pursuing actor object
+--[2] the target actor object of [1]
+--[3] number in seconds to deduct to the time it takes to teleport (optional)
 local function chaseCombatTarget(data)
-    local actor, target, bool, masa = unpack(data)
+    local actor, target, masa = unpack(data)
     local delay
-    local delay2 = core.getGameTimeInSeconds() - masa
+
     if not target then
         return
     end
@@ -78,8 +82,8 @@ local function chaseCombatTarget(data)
     else
         delay = (actor.position - bestDoor.position):length() / (actor:getRunSpeed() * 1.8)
     end
-    if not bool then
-        delay = delay - delay2
+    if masa and type(masa) == "number" then
+        delay = delay - masa
     end
     if delay > 15 then
         print(string.format("%s will not pursue further", actor))
