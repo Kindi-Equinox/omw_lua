@@ -9,7 +9,7 @@ local function onActive()
         return
     end
     for k, v in pairs(tabpursuer) do
-        if self:canMove() then
+        if self:canMove() and v[1]:canMove() then
             core.sendGlobalEvent("chaseCombatTarget_eqnx", {v[1], v[2], false, masa})
         else
             tabpursuer = {}

@@ -105,6 +105,9 @@ end
 return {
     engineHandlers = {
         onActorActive = function(actor)
+			if not actor:isValid() then
+				return
+			end
             if actor and (actor.type == "NPC" or actor.type == "Creature") then
                 actor:addScript("pursuit_for_omw/pursued.lua")
                 actor:addScript("pursuit_for_omw/pursuer.lua")
