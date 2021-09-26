@@ -39,7 +39,9 @@ end
 
 local function onUpdate()
     if not checkCell(self.cell.name) then
-        timer()
+		if leaveTimer ~= 11 then
+			timer()
+		end
         ownerOfStronghold = nil
         leaveTimer = 11
         aggressive = false
