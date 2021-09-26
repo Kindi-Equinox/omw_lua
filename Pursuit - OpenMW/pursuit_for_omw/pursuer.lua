@@ -20,8 +20,11 @@ local function onUpdate()
         combatTarget = nil
         return
     end
+	if not self:getCombatTarget():canMove() then
+		return
+	end
     combatTarget = self:getCombatTarget()
-    if self:getCombatTarget().type ~= "Player" and self:getCombatTarget():canMove() then
+    if self:getCombatTarget().type ~= "Player" then
         self:getCombatTarget():sendEvent("pursuers_eqnx", self.object)
     end
 end
@@ -31,7 +34,7 @@ local function onInactive()
     if
         oricell ~= self.cell.name and not combatTarget and self:canMove() and
             (self.recordId:match("guard") or self.recordId:match("ordinator") or
-                (self:getEquipment()[1] and self:getEquipment()[1].recordId:match("imperial") and oricell:match("Gnisis")))
+                (self:getEquipment()[1] and self:getEquipment()[1].recordId:match("imperial")))
      then
         core.sendGlobalEvent("returnToCell_eqnx", {self.object, oricell, nil, oripos})
     end
