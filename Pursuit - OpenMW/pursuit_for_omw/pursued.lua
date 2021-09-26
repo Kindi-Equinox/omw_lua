@@ -9,8 +9,8 @@ local function onActive()
         return
     end
     for k, v in pairs(tabpursuer) do
-        if self:canMove() and v[1]:canMove() then
-            core.sendGlobalEvent("chaseCombatTarget_eqnx", {v[1], v[2], false, masa})
+        if self:canMove() and v:canMove() then
+            core.sendGlobalEvent("chaseCombatTarget_eqnx", {v, self.object, false, masa})
         else
             tabpursuer = {}
         end
@@ -34,7 +34,7 @@ return {
     },
     eventHandlers = {
         pursuers_eqnx = function(data)
-            tabpursuer[tostring(data)] = {data, self.object}
+            tabpursuer[tostring(data)] = data
         end
     }
 }
