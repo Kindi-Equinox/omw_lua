@@ -4,26 +4,18 @@ local query = require("openmw.query")
 local core = require("openmw.core")
 local nearby = require("openmw.nearby")
 local stronghold = require("stronghold_protectors.strongholds")
-local hostileToPlayer = false
+local functions = require("stronghold_protectors.functions")
+local hostileToPlayer = false --changes when in stronghold only
 local playerRef
-
-local function checkCell(cell)
-    for _, v in pairs(stronghold) do
-        if cell:match(v) then
-            return true
-        end
-    end
-    return false
-end
 
 local function onInactive()
     if not hostileToPlayer then
         return
     end
 
-    if playerRef.cell ~= self.cell then
-        self:stopCombat()
-    end
+    self:stopCombat()
+    hostileToPlayer = false
+
 end
 
 local function onUpdate()
@@ -31,7 +23,7 @@ local function onUpdate()
         return
     end
 
-    if not checkCell(self.cell.name) then
+    if not functions.checkCellIsStronghold(self.cell.name) then
         return
     end
 
@@ -39,44 +31,43 @@ local function onUpdate()
         return
     end
 
-    if self:getCombatTarget().type == "Player" then
+    if functions.isOwnerHere(nearby) then
+        return
     end
 
+    if self:getCombatTarget().type == "Player" then
+    --do something about this specific event later
+    else
+        return
+    end
+
+    --if it's a renegade creature in the property or an NPC that attacks the player, all tenants of the stronghold will attack it
     for _, actor in nearby.actors:ipairs() do
-        if actor:isValid() and actor:canMove() and (actor.position - self.position):length() < 1000 then
-            if actor ~= self.object then
-                actor:sendEvent("attackIntruder_strghld_protect", {self.object, playerRef})
-            end
+        if actor ~= self.object and actor ~= self:getCombatTarget() and self:canMove() and self:isValid() and actor:isValid() and actor:canMove() and (actor.position - self.position):length() < 2048 then
+            actor:sendEvent("attackIntruder_strghld_protect", {self.object, playerRef})
         end
     end
 end
 
 local function attackIntruder_strghld_protect(data)
     local intruder, owner = unpack(data)
-    if not self:canMove() or not self:isValid() then
-        return
-    end
-    for _, actor in nearby.actors:ipairs() do
-        if actor ~= self.object then
-            if not self:getCombatTarget() then
-                if intruder.type == "Player" then
-                    hostileToPlayer = true
-                    playerRef = intruder
-                else
-                    hostileToPlayer = false
-                end
-                self:startCombat(intruder)
-            end
+    if not self:getCombatTarget() then
+        if intruder.type == "Player" then
+            hostileToPlayer = true
+            playerRef = intruder
+        else
+            hostileToPlayer = false
         end
+        self:startCombat(intruder)
     end
 end
 
-aux.runEveryNSeconds(3.37, onUpdate)
+aux.runEveryNSeconds(1.67, onUpdate)
 
 return {
     engineHandlers = {
         onLoad = function()
-            aux.runEveryNSeconds(3.37, onUpdate)
+            aux.runEveryNSeconds(1.67, onUpdate)
         end,
         onInactive = onInactive
     },

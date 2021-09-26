@@ -5,6 +5,7 @@ local core = require("openmw.core")
 local nearby = require("openmw.nearby")
 local async = require("openmw.async")
 local stronghold = require("stronghold_protectors.strongholds")
+local functions = require("stronghold_protectors.functions")
 local uiText = require("openmw.ui").showMessage
 
 local atAStronghold = false
@@ -15,33 +16,13 @@ local leaveTimer = 11
 local startTimer = false
 local timer
 
-local function checkCell(cell)
-    for _, v in pairs(stronghold) do
-        if cell:match(v) then
-            return true
-        end
-    end
-    return false
-end
 
-local function isOwnerHere()
-    for _, actor in nearby.actors:ipairs() do
-        if
-            actor:isValid() and actor.type == "NPC" and
-            (actor.recordId == "banden indarys" or actor.recordId == "raynasa rethan" or
-            actor.recordId == "reynel uvirith")
-        then
-            return true
-        end
-    end
-    return false
-end
 
 local function onUpdate()
-    if not checkCell(self.cell.name) then
-		if leaveTimer ~= 11 then
-			timer()
-		end
+    if not functions.checkCellIsStronghold(self.cell.name) then
+        if leaveTimer ~= 11 then
+            timer()
+        end
         ownerOfStronghold = nil
         leaveTimer = 11
         aggressive = false
@@ -49,7 +30,7 @@ local function onUpdate()
         return
     end
 
-    if not isOwnerHere() then
+    if not functions.isOwnerHere(nearby) then
         return
     end
 
@@ -58,6 +39,7 @@ local function onUpdate()
             if self:isInWeaponStance() or aggressive then
                 uiText("The residents consider you an intruder.")
                 actor:sendEvent("attackIntruder_strghld_protect", {self.object, ownerOfStronghold})
+				aggressive = true
             elseif not aggressive then
                 uiText(
                     string.format(

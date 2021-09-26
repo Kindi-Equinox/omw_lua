@@ -1,9 +1,6 @@
 local query = require("openmw.query")
-local async = require("openmw.async")
-local util = require("openmw.util")
-local core = require("openmw.core")
 local world = require("openmw.world")
-local stronghold = require("stronghold_protectors.strongholds")
+local functions = require("stronghold_protectors.functions")
 
 
 local playerRef
@@ -11,20 +8,11 @@ local playerRef
 return {
     engineHandlers = {
         onActorActive = function(actor)
-            local strongholdActor = false
             if not actor:isValid() then
                 return
             end
 
-            for _, cell in pairs(stronghold) do
-                if actor.cell.name:match(cell) then
-                    strongholdActor = true
-                    break
-                end
-                strongholdActor = false
-            end
-
-            if not strongholdActor then
+            if not functions.checkCellIsStronghold(actor.cell.name) then
                 return
             end
 
