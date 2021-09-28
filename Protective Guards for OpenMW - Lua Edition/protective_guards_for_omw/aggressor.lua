@@ -67,7 +67,6 @@ local function selfIsHostileCheck()
                         searchGuardsAdjacentCells(self.object)
                     end
                 elseif playerRef.inventory:countOf("PG_TrigCrime") > 0 and not resistedArrest and not functions.isGuard(self) then
-                    print(self)
                     if math.random(5) < 3 then
                         actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {self.object})
                         searchGuardsAdjacentCells(self.object)
