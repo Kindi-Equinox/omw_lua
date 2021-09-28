@@ -95,7 +95,7 @@ local function selfIsHostileCheck()
                         actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {self.object})
                         searchGuardsAdjacentCells(self.object)
                     end
-                elseif pacifist == 1 and not self.type == "Creature" then
+                elseif pacifist == 1 and self.type ~= "Creature" then
                     actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {self.object})
                 elseif crimeLevel >= outlawLevel and not functions.isGuard(self) and pacifist == 2 then
                     actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {playerRef})
@@ -117,7 +117,7 @@ local function selfIsHostileCheck()
                 if crimeLevel > 0 then
                     searchGuardsAdjacentCells(playerRef)
                 else
-                    --searchGuardsAdjacentCells(self.object)
+                    --do nothing
                 end
 
         end

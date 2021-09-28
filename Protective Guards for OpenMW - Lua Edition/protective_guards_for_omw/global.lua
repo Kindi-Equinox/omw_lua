@@ -53,12 +53,12 @@ return {
                 return
             end
 
-			if actor.type == "NPC" or actor.type == "Creature" then
+
             actor:addScript("protective_guards_for_omw/aggressor.lua")
             if functions.isGuard(actor) then
                 actor:addScript("protective_guards_for_omw/protect.lua")
             end
-			end
+
         end,
 		onPlayerAdded = function(player)
 			player:addScript("protective_guards_for_omw/notifications.lua")
