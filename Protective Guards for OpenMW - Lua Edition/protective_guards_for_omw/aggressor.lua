@@ -93,7 +93,7 @@ return {
         end,
         onUpdate = function(dt)
 
-            if resistedArrest then
+            if resistedArrest and playerRef then
                 if playerRef.inventory:countOf("PG_TrigCrime") == 0 then
                     resistedArrest = false
                     self:stopCombat()
