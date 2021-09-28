@@ -2,11 +2,16 @@ local self = require("openmw.self")
 local nearby = require("openmw.nearby")
 local aux = require("openmw_aux.util")
 local core = require("openmw.core")
+local functions = require("protective_guards_for_omw.functions")
 local bL = require("protective_guards_for_omw.blacklistedareas")
+local timer = 0
 local firstRun = false
 local previousCell
+local playerRef
+local resistedArrest = false --only relevant if script is attached on guards
 
-local function searchGuardsAdjacentCells()
+local function searchGuardsAdjacentCells(target)
+
     if not firstRun then
         return
     end
@@ -18,14 +23,15 @@ local function searchGuardsAdjacentCells()
     for _, door in nearby.doors:ipairs() do
         if
             door.destCell ~= previousCell and door.isTeleport and
-                (door.position - self.position):length() < doorDistCheck
-         then
+            (door.position - self.position):length() < doorDistCheck
+        then
             tempTab[tostring(door)] = door
         end
     end
     for _, door in pairs(tempTab) do
-        core.sendGlobalEvent("ProtectiveGuards_searchGuards_eqnx", {door, self.object})
+        core.sendGlobalEvent("ProtectiveGuards_searchGuards_eqnx", {door, target})
     end
+    firstRun = false
 end
 
 local function selfIsHostileCheck()
@@ -36,54 +42,84 @@ local function selfIsHostileCheck()
         firstRun = true
         return
     end
-    local playerRef
+
     local distCheck = 8192
     if self.cell.isExterior then
         distCheck = distCheck / 4
     end
     if self:getCombatTarget().type == "Player" then
         playerRef = self:getCombatTarget()
-        if playerRef.inventory:countOf("PG_TrigCrime") > 0 then
-            return
-        end
+
+
         for _, actor in nearby.actors:ipairs() do
             if
-                actor ~= self.object and actor.type == "NPC" and (actor.position - self.position):length() < distCheck and
-                    (string.match(actor.recordId, "guard") or string.match(actor.recordId, "ordinator") or
-                        (actor:getEquipment()[1] and actor:getEquipment()[1].recordId:match("imperial") and self.cell.name:match("Gnisis")))
-             then
-				if math.random(5) < 3 then
-                actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", self.object)
-				end
+                actor ~= self.object and actor.type == "NPC" and
+                (actor.position - self.position):length() < distCheck and
+                functions.isGuard(actor)
+            then
+                if playerRef.inventory:countOf("PG_TrigCrime") > 0 and functions.isGuard(self) then
+                        actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {playerRef})
+                        --searchGuardsAdjacentCells(playerRef) bad
+                        resistedArrest = true
+                elseif playerRef.inventory:countOf("PG_TrigCrime") == 0 and not resistedArrest then
+                    if math.random(5) < 3 then
+                        actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {self.object})
+                        searchGuardsAdjacentCells(self.object)
+                    end
+                elseif playerRef.inventory:countOf("PG_TrigCrime") > 0 and not resistedArrest and not functions.isGuard(self) then
+                    print(self)
+                    if math.random(5) < 3 then
+                        actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {self.object})
+                        searchGuardsAdjacentCells(self.object)
+                    end
+                end
             end
         end
-        searchGuardsAdjacentCells()
-        firstRun = false
+
+
     end
 end
 
 aux.runEveryNSeconds(0.5, selfIsHostileCheck)
-aux.runEveryNSeconds(
-    3,
-    function()
-        firstRun = true
-    end
-)
+
 
 return {
     engineHandlers = {
         onLoad = function()
             aux.runEveryNSeconds(0.5, selfIsHostileCheck)
-            aux.runEveryNSeconds(
-                3,
-                function()
-                    firstRun = true
-                end
-            )
         end,
         onInactive = function()
             firstRun = true
             previousCell = self.cell
+        end,
+        onUpdate = function(dt)
+
+            if resistedArrest then
+                if playerRef.inventory:countOf("PG_TrigCrime") == 0 then
+                    resistedArrest = false
+                    self:stopCombat()
+                end
+            end
+
+
+            if timer < 3 then
+                timer = timer + dt
+            else
+                firstRun = true
+                timer = 0
+            end
         end
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
