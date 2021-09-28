@@ -13,7 +13,7 @@ local previousCell
 local playerRef
 local resistedArrest = false --only relevant if script is attached on guards
 local pacifist = 0 --1no, 2yes
-
+local crimeLevel = 0
 
 
 
@@ -27,9 +27,11 @@ local pacifist = 0 --1no, 2yes
 --some stuff
 
 
-
+--this is an alpha version serving as a placeholder for future updates
 --for now various methods is used to detect AI behavior
---not recommended for mass combat because the engine performs poorly on that situation
+--not recommended for mass combat because the game engine performs poorly on that situation now
+
+
 
 local function searchGuardsAdjacentCells(target)
 
@@ -67,11 +69,15 @@ local function selfIsHostileCheck()
     local guardsNearby = false
     local distCheck = 8192
     if self.cell.isExterior then
-        distCheck = distCheck / 3
+        distCheck = distCheck / 2
     end
     if self:getCombatTarget().type == "Player" then
         playerRef = self:getCombatTarget()
-        local crimeLevel = playerRef.inventory:countOf("PG_TrigCrime")
+        crimeLevel = playerRef.inventory:countOf("PG_TrigCrime")
+
+		if functions.isGuard(self) then
+			guardsNearby = true
+		end
 
         for _, actor in nearby.actors:ipairs() do
             if
@@ -79,7 +85,7 @@ local function selfIsHostileCheck()
                 (actor.position - playerRef.position):length() < distCheck and
                 functions.isGuard(actor)
             then
-                guardsNearby = true
+				guardsNearby = true
                 if crimeLevel > 0 and functions.isGuard(self) then
                     actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {playerRef})
                     --searchGuardsAdjacentCells(playerRef) bad
@@ -89,7 +95,7 @@ local function selfIsHostileCheck()
                         actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {self.object})
                         searchGuardsAdjacentCells(self.object)
                     end
-                elseif pacifist == 1 then
+                elseif pacifist == 1 and not self.type == "Creature" then
                     actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {self.object})
                 elseif crimeLevel >= outlawLevel and not functions.isGuard(self) and pacifist == 2 then
                     actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {playerRef})
@@ -106,6 +112,14 @@ local function selfIsHostileCheck()
                     searchGuardsAdjacentCells(self.object)
                 end
             end
+		else
+
+                if crimeLevel > 0 then
+                    searchGuardsAdjacentCells(playerRef)
+                else
+                    --searchGuardsAdjacentCells(self.object)
+                end
+
         end
 
 
@@ -126,6 +140,17 @@ return {
             firstRun = true
             previousCell = self.cell
         end,
+		onActive = function()
+			if self:getCombatTarget() and self:getCombatTarget().type == "Player" then
+				if crimeLevel > 0 and not functions.isGuard(self) and pacifist == 2 then
+					for _, actor in nearby.actors:ipairs() do
+						if functions.isGuard(actor) then
+							actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {playerRef})
+						end
+					end
+				end
+			end
+		end,
         onUpdate = function(dt)
             if not self.type == "NPC" then return end
 
@@ -137,17 +162,8 @@ return {
             end
 
 
-
-            if pacifist == 0 then
-                if self:getCombatTarget() then
-                    pacifist = 1 --initialy hostile
-                else
-                    pacifist = 2 --initialy peaceful
-                end
-            end
-
-
             if resistedArrest then
+				playerRef:sendEvent("ProtectiveGuards_notifications_eqnx", {self.cell.name})
                 if playerRef.inventory:countOf("PG_TrigCrime") == 0 then
                     resistedArrest = false
                     self:stopCombat()
@@ -160,6 +176,13 @@ return {
 				playerRef = nearby.selectObjects(query.actors:where(query.OBJECT.type:eq("Player")))[1]
 			end
 
+			if pacifist == 0 then
+                if self:getCombatTarget() then
+                    pacifist = 1 --initialy hostile
+                else
+                    pacifist = 2 --initialy peaceful
+                end
+            end
         end
     }
 }

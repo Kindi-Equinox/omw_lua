@@ -16,7 +16,7 @@ local function updateCombat(dt)
     else
         timer = 0
     end
-
+	target = nil
     if not self:getCombatTarget() then return end
     if (self.cell.isExterior or self.cell ~= self:getCombatTarget().cell) and
         (self:getCombatTarget().position - self.position):length() > 4096

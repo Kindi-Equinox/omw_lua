@@ -60,6 +60,9 @@ return {
             end
 			end
         end,
+		onPlayerAdded = function(player)
+			player:addScript("protective_guards_for_omw/notifications.lua")
+		end,
         onLoad = function()
             aux.runEveryNSeconds(
                 10,
