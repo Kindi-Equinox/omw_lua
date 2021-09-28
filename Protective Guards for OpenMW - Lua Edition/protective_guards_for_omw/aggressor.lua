@@ -1,14 +1,35 @@
 local self = require("openmw.self")
 local nearby = require("openmw.nearby")
 local aux = require("openmw_aux.util")
+local query = require("openmw.query")
 local core = require("openmw.core")
+local settings = require('openmw.settings')
 local functions = require("protective_guards_for_omw.functions")
 local bL = require("protective_guards_for_omw.blacklistedareas")
+local outlawLevel = settings.getGMST("iCrimeThreshold") * settings.getGMST("iCrimeThresholdMultiplier")
 local timer = 0
 local firstRun = false
 local previousCell
 local playerRef
 local resistedArrest = false --only relevant if script is attached on guards
+local pacifist = 0 --1no, 2yes
+
+
+
+
+
+--todo
+--use AI package to better detect NPC AI
+--use crime event to detect crime
+--use attack event to detect attack
+--use a method to get crime level
+--use a method to determine hostility status towards an actor
+--some stuff
+
+
+
+--for now various methods is used to detect AI behavior
+--not recommended for mass combat because the engine performs poorly on that situation
 
 local function searchGuardsAdjacentCells(target)
 
@@ -43,40 +64,54 @@ local function selfIsHostileCheck()
         return
     end
 
+    local guardsNearby = false
     local distCheck = 8192
     if self.cell.isExterior then
-        distCheck = distCheck / 4
+        distCheck = distCheck / 3
     end
     if self:getCombatTarget().type == "Player" then
         playerRef = self:getCombatTarget()
-
+        local crimeLevel = playerRef.inventory:countOf("PG_TrigCrime")
 
         for _, actor in nearby.actors:ipairs() do
             if
                 actor ~= self.object and actor.type == "NPC" and
-                (actor.position - self.position):length() < distCheck and
+                (actor.position - playerRef.position):length() < distCheck and
                 functions.isGuard(actor)
             then
-                if playerRef.inventory:countOf("PG_TrigCrime") > 0 and functions.isGuard(self) then
-                        actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {playerRef})
-                        --searchGuardsAdjacentCells(playerRef) bad
-                        resistedArrest = true
-                elseif playerRef.inventory:countOf("PG_TrigCrime") == 0 and not resistedArrest then
+                guardsNearby = true
+                if crimeLevel > 0 and functions.isGuard(self) then
+                    actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {playerRef})
+                    --searchGuardsAdjacentCells(playerRef) bad
+                    resistedArrest = true
+                elseif crimeLevel == 0 and not resistedArrest then
                     if math.random(5) < 3 then
                         actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {self.object})
                         searchGuardsAdjacentCells(self.object)
                     end
-                elseif playerRef.inventory:countOf("PG_TrigCrime") > 0 and not resistedArrest and not functions.isGuard(self) then
-                    if math.random(5) < 3 then
-                        actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {self.object})
-                        searchGuardsAdjacentCells(self.object)
-                    end
+                elseif pacifist == 1 then
+                    actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {self.object})
+                elseif crimeLevel >= outlawLevel and not functions.isGuard(self) and pacifist == 2 then
+                    actor:sendEvent("ProtectiveGuards_alertGuard_eqnx", {playerRef})
+					searchGuardsAdjacentCells(playerRef)
+                end
+            end
+        end
+
+        if not guardsNearby then
+            if not functions.isGuard(self) then
+                if crimeLevel > 0 then
+                    searchGuardsAdjacentCells(playerRef)
+                else
+                    searchGuardsAdjacentCells(self.object)
                 end
             end
         end
 
 
     end
+
+    guardsNearby = false
 end
 
 aux.runEveryNSeconds(0.5, selfIsHostileCheck)
@@ -92,14 +127,7 @@ return {
             previousCell = self.cell
         end,
         onUpdate = function(dt)
-
-            if resistedArrest and playerRef then
-                if playerRef.inventory:countOf("PG_TrigCrime") == 0 then
-                    resistedArrest = false
-                    self:stopCombat()
-                end
-            end
-
+            if not self.type == "NPC" then return end
 
             if timer < 3 then
                 timer = timer + dt
@@ -107,6 +135,31 @@ return {
                 firstRun = true
                 timer = 0
             end
+
+
+
+            if pacifist == 0 then
+                if self:getCombatTarget() then
+                    pacifist = 1 --initialy hostile
+                else
+                    pacifist = 2 --initialy peaceful
+                end
+            end
+
+
+            if resistedArrest then
+                if playerRef.inventory:countOf("PG_TrigCrime") == 0 then
+                    resistedArrest = false
+                    self:stopCombat()
+                end
+            end
+
+
+			--awkward way to get the player object
+            if not playerRef then
+				playerRef = nearby.selectObjects(query.actors:where(query.OBJECT.type:eq("Player")))[1]
+			end
+
         end
     }
 }

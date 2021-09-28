@@ -10,7 +10,7 @@ local target
 local function updateCombat(dt)
 
 
-    if timer < 0.5 then
+    if timer < 2.67 then
         timer = timer + dt
         return
     else
