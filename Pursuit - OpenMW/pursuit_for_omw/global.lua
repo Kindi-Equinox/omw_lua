@@ -62,8 +62,8 @@ local travelToTheDoor =
 local function chaseCombatTarget(data)
     local actor, target, masa = unpack(data)
     local delay
-
-    if not target then
+	actor:sendEvent("Pursuit_savePos_eqnx")
+    if not target or not actor then
         return
     end
     if not actor:isValid() or not target:isValid() then
