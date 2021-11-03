@@ -6,6 +6,10 @@ local oricell
 local oripos
 local combatTarget
 
+
+
+
+
 local function savePos_eqnx()
     if not oricell then
         oricell = self.cell.name
@@ -20,31 +24,20 @@ local function onUpdate()
         combatTarget = nil
         return
     end
-	if not self:getCombatTarget():canMove() then
-		return
-	end
+    if not self:getCombatTarget():canMove() then
+        return
+    end
     combatTarget = self:getCombatTarget()
     if self:getCombatTarget().type ~= "Player" then
         self:getCombatTarget():sendEvent("Pursuit_pursuerData_eqnx", self.object)
     end
 end
 
-local function onInactive()
-    savePos_eqnx()
-    if
-        oricell ~= self.cell.name and not combatTarget and self:canMove() and
-            (self.recordId:match("guard") or self.recordId:match("ordinator") or
-                (self:getEquipment()[1] and self:getEquipment()[1].recordId:match("imperial")))
-     then
-        core.sendGlobalEvent("Pursuit_returnToCell_eqnx", {self.object, oricell, nil, oripos})
-    end
-end
-
-aux.runEveryNSeconds(0.1, onUpdate)
-
-return {
+local this = {
     engineHandlers = {
-        onLoad = function(data)
+        onLoad = function(data, i)
+			print(self)
+			print(i)
             if data then
                 oricell, oripos = unpack(data)
             end
@@ -53,7 +46,16 @@ return {
         onSave = function()
             return {oricell, oripos}
         end,
-        onInactive = onInactive,
+        onInactive = function ()
+            savePos_eqnx()
+            if
+                oricell ~= self.cell.name and not combatTarget and self:canMove() and
+                (self.recordId:match("guard") or self.recordId:match("ordinator") or
+                (self:getEquipment()[1] and self:getEquipment()[1].recordId:match("imperial")))
+            then
+                core.sendGlobalEvent("Pursuit_returnToCell_eqnx", {self.object, oricell, nil, oripos})
+            end
+        end,
         onActive = function()
             if not oricell then
                 oricell = self.cell.name
@@ -67,3 +69,11 @@ return {
         Pursuit_savePos_eqnx = savePos_eqnx
     }
 }
+
+
+
+
+
+aux.runEveryNSeconds(0.1, onUpdate)
+
+return this

@@ -1,1 +1,3 @@
-pursuit_for_omw/global.lua
+GLOBAL: pursuit_for_omw/global.lua
+CUSTOM, PLAYER, NPC, CREATURE: pursuit_for_omw/pursuer.lua
+CUSTOM, PLAYER, NPC, CREATURE: pursuit_for_omw/pursued.lua
