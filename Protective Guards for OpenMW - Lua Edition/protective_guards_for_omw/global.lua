@@ -4,6 +4,13 @@ local aux = require("openmw_aux.util")
 local searchedCells = {}
 local pursuit_for_omw = false
 
+aux.runEveryNSeconds(
+    10,
+    function()
+        searchedCells = {}
+    end
+)
+
 local function searchGuards(data)
     if not pursuit_for_omw then
         return
@@ -28,13 +35,6 @@ local function searchGuards(data)
     end
 end
 
-aux.runEveryNSeconds(
-    10,
-    function()
-        searchedCells = {}
-    end
-)
-
 return {
     engineHandlers = {
         onActorActive = function(actor)
@@ -45,14 +45,6 @@ return {
             if actor.type == "NPC" then
                 actor:addScript("protective_guards_for_omw/protect.lua")
             end
-        end,
-        onLoad = function()
-            aux.runEveryNSeconds(
-                10,
-                function()
-                    searchedCells = {}
-                end
-            )
         end
     },
     eventHandlers = {

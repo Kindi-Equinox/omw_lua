@@ -35,9 +35,7 @@ end
 
 local this = {
     engineHandlers = {
-        onLoad = function(data, i)
-			print(self)
-			print(i)
+        onLoad = function(data)
             if data then
                 oricell, oripos = unpack(data)
             end

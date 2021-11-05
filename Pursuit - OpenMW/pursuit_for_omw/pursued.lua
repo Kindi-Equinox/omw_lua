@@ -2,28 +2,21 @@ local core = require("openmw.core")
 local self = require("openmw.self")
 local query = require("openmw.query")
 local tabpursuer = {}
-
---time between active and inactive state during pursuit
-local masa = 0
+local masa = 0 --time between active and inactive state during pursuit
 
 
-local this = {
+return {
     engineHandlers = {
         onActive = function()
             if not next(tabpursuer) then
                 return
             end
-
             masa = core.getGameTimeInSeconds() - masa
-
             for k, v in pairs(tabpursuer) do
                 if self:canMove() and v:canMove() then
                     core.sendGlobalEvent("Pursuit_chaseCombatTarget_eqnx", {v, self.object, masa})
-                else
-                    tabpursuer = {}
                 end
             end
-
             tabpursuer = {}
         end,
         onInactive = function()
@@ -42,6 +35,3 @@ local this = {
         end
     }
 }
-
-
-return this;

@@ -72,15 +72,6 @@ aux.runEveryNSeconds(
 
 return {
     engineHandlers = {
-        onLoad = function()
-            aux.runEveryNSeconds(0.5, selfIsHostileCheck)
-            aux.runEveryNSeconds(
-                3,
-                function()
-                    firstRun = true
-                end
-            )
-        end,
         onInactive = function()
             firstRun = true
             previousCell = self.cell

@@ -1,4 +1,4 @@
 GLOBAL: protective_guards_for_omw/global.lua
-CUSTOM, PLAYER, NPC, CREATURE: protective_guards_for_omw/aggressor.lua
-CUSTOM, PLAYER, NPC, CREATURE: protective_guards_for_omw/protect.lua
+CUSTOM: protective_guards_for_omw/aggressor.lua
+CUSTOM: protective_guards_for_omw/protect.lua
 
