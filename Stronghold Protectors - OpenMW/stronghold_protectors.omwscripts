@@ -1,1 +1,3 @@
-stronghold_protectors/global.lua
+GLOBAL: stronghold_protectors/global.lua
+PLAYER: stronghold_protectors/player.lua
+NPC, CREATURE: stronghold_protectors/protector.lua
