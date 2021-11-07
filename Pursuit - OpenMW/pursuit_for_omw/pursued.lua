@@ -4,7 +4,6 @@ local query = require("openmw.query")
 local tabpursuer = {}
 local masa = 0 --time between active and inactive state during pursuit
 
-
 return {
     engineHandlers = {
         onActive = function()

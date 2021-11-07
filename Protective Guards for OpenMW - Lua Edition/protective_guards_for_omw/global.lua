@@ -24,7 +24,8 @@ local function searchGuards(data)
     for _, actor in adjacentCellActors:ipairs() do
         if
             actor:canMove() and actor.recordId:match("guard") or actor.recordId:match("ordinator") or
-                (actor:getEquipment()[1] and actor:getEquipment()[1].recordId:match("imperial") and agg.cell.name:match("Gnisis"))
+                (actor:getEquipment()[1] and actor:getEquipment()[1].recordId:match("imperial") and
+                    agg.cell.name:match("Gnisis"))
          then
             actor:addScript("pursuit_for_omw/pursuer.lua")
             actor:addScript("protective_guards_for_omw/protect.lua")
@@ -36,17 +37,6 @@ local function searchGuards(data)
 end
 
 return {
-    engineHandlers = {
-        onActorActive = function(actor)
-            if not actor or not actor:isValid() then
-                return
-            end
-            actor:addScript("protective_guards_for_omw/aggressor.lua")
-            if actor.type == "NPC" then
-                actor:addScript("protective_guards_for_omw/protect.lua")
-            end
-        end
-    },
     eventHandlers = {
         ProtectiveGuards_searchGuards_eqnx = searchGuards,
         Pursuit_installed_eqnx = function()
