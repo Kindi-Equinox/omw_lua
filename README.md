@@ -1,6 +1,6 @@
-# luanotsosecretalready
+# KEQNX Lua Mods
 
-OpenMW and Morrowind lua mods
+OpenMW/Morrowind lua mods
 
 If you're downloading here, It is recommended to install the (Pursuit + Protective Guards) combo to avoid potential conflicts. 
 
