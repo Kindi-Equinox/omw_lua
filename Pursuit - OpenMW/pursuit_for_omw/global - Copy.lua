@@ -3,7 +3,28 @@ local async = require("openmw.async")
 local util = require("openmw.util")
 local core = require("openmw.core")
 local world = require("openmw.world")
+local functions = require("pursuit_for_omw.functions")
 local playerRef
+
+local blockedActors = {}
+--[[
+(still under testing)
+--use this event to block any actor from pursuing through doors
+--core.sendGlobalEvent("Pursuit_blockActorPursuit_eqnx",{x, y})
+--x can be game object or record ID
+--y can be a boolean or table with serializable values (optional)
+
+--block the actor
+--core.sendGlobalEvent("Pursuit_blockActorPursuit_eqnx",{actor, true}) --simple block
+--core.sendGlobalEvent("Pursuit_blockActorPursuit_eqnx", {actor, {}}) --block without conditions
+--core.sendGlobalEvent("Pursuit_blockActorPursuit_eqnx",{actor}) --block, nil is interpreted as true
+--core.sendGlobalEvent("Pursuit_blockActorPursuit_eqnx", actor) --block
+--core.sendGlobalEvent("Pursuit_blockActorPursuit_eqnx",{actor, {conditions}}) --block with conditions
+
+--unblock the actor
+--core.sendGlobalEvent("Pursuit_blockActorPursuit_eqnx", {actor, false})
+]]
+
 
 --todo
 --prevent some type of creatures from chasing through doors
@@ -39,10 +60,9 @@ local function returnToCell(data)
         actor:teleport(cell, position)
         return
     end
-    --advanced AI part
-    --aipackage to order guards back to cell by making them walk to door
-    actor:teleport(cell, position) --temporary
+    actor:teleport(cell, position)
     --actor:teleport(cell, bestDoor.destPosition - util.vector3(math.random(-100, 100), math.random(-100, 100), 50))
+    --aipackage to order guards back to cell
 end
 
 local travelToTheDoor =
@@ -63,6 +83,11 @@ local travelToTheDoor =
 local function chaseCombatTarget(data)
     local actor, target, masa = unpack(data)
     local delay
+    local conditions = blockedActors[tostring(actor)] or blockedActors[actor.recordId]
+
+    if not functions or not functions.passAllConditions(actor, target, conditions) then
+        return
+    end
 
     actor:sendEvent("Pursuit_savePos_eqnx")
 
@@ -109,9 +134,13 @@ local function chaseCombatTarget(data)
     )
 end
 
+
+
+
+
 return {
     engineHandlers = {
-        onPlayerAdded = function(player)
+		onPlayerAdded = function(player)
             playerRef = player
         end,
         onActorActive = function(actor)
@@ -134,6 +163,34 @@ return {
         end
     },
     eventHandlers = {
+        --[[Pursuit_blockActorPursuit_eqnx = function(data)
+            if type(data) ~= "table" then
+                data = {data}
+            end
+
+            local actor, conditions = unpack(data)
+
+            assert(
+                type(actor) == "string" or type(actor) == "userdata",
+                string.format(
+                    "[Pursuit] block has received an invalid actor value (%s)?. Actor value must be a string ID or game object.",
+                    type(actor)
+                )
+            )
+
+
+            if conditions == nil then
+                conditions = true
+            end
+
+            if conditions == false then
+                --print(string.format("[Pursuit] %s successfully removed from BLOCKED list", actor))
+                blockedActors[tostring(actor)] = nil
+            else
+                --print(string.format("[Pursuit] %s successfully added to BLOCKED list", actor))
+                blockedActors[tostring(actor)] = conditions
+            end
+        end,]]
         Pursuit_chaseCombatTarget_eqnx = chaseCombatTarget,
         Pursuit_returnToCell_eqnx = returnToCell
     }

@@ -7,12 +7,8 @@ local oripos
 local combatTarget
 
 local function savePos_eqnx()
-    if not oricell then
-        oricell = self.cell.name
-    end
-    if not oripos then
-        oripos = self.position
-    end
+    oricell = oricell or self.cell.name
+    oripos = oripos or self.position
 end
 
 aux.runEveryNSeconds(
@@ -25,9 +21,12 @@ aux.runEveryNSeconds(
         if not self:getCombatTarget():canMove() then
             return
         end
+
+        --getCombatTarget() always return nil when actor is inactive
         combatTarget = self:getCombatTarget()
+
         if self:getCombatTarget().type ~= "Player" then
-            self:getCombatTarget():sendEvent("Pursuit_pursuerData_eqnx", self.object)
+            self:getCombatTarget():sendEvent("Pursuit_pursuerData_eqnx", self)
         end
     end
 )
@@ -49,7 +48,7 @@ return {
                     (self.recordId:match("guard") or self.recordId:match("ordinator") or
                         (self:getEquipment()[1] and self:getEquipment()[1].recordId:match("imperial")))
              then
-                core.sendGlobalEvent("Pursuit_returnToCell_eqnx", {self.object, oricell, nil, oripos})
+                core.sendGlobalEvent("Pursuit_returnToCell_eqnx", {self, oricell, nil, oripos})
             end
         end,
         onActive = function()

@@ -16,10 +16,10 @@ local function searchGuards(data)
         return
     end
     local door, agg = unpack(data)
-    if searchedCells[tostring(door)] then
+    if searchedCells[door] then
         return
     end
-    searchedCells[tostring(door)] = true
+    searchedCells[door] = ""
     local adjacentCellActors = door.destCell:selectObjects(query.actors)
     for _, actor in adjacentCellActors:ipairs() do
         if
