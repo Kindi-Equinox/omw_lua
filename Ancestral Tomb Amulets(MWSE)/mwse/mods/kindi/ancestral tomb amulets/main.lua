@@ -203,9 +203,9 @@ end
     end
     tes3ui.forcePlayerInventoryUpdate()
     tes3ui.updateInventoryTiles()
-    amuletCreationCellRecycle(tes3.getPlayerCell())]]
+    amuletCreationCellRecycle(tes3.getPlayerCell())
 end
-event.register("keyDown", getall, {filter = tes3.scanCode.g})
+event.register("keyDown", getall, {filter = tes3.scanCode.g})]]
 
 event.register("equipped", amuletEquipped)
 event.register("loaded", loadDataAndCheckMod)
