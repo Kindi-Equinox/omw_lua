@@ -223,9 +223,9 @@ core.teleport = function(cell, equipor)
                 --[[using delayoneframe because #INFO or #INDO error can happen, unsure what it is. Not 100% reliable but no harm]]
                 timer.delayOneFrame(
                     function()
-						if not tes3.getObject("atakinditelevfx") then
-							return
-						end
+                        if not tes3.getObject("atakinditelevfx") then
+                            return
+                        end
                         local r =
                             tes3.createReference {
                             object = "atakinditelevfx",
@@ -235,7 +235,7 @@ core.teleport = function(cell, equipor)
                         }
                         r.hasNoCollision = true
                         timer.start {
-							type = timer.real,
+                            type = timer.real,
                             duration = 0.1,
                             iterations = 19,
                             callback = function()
@@ -450,11 +450,12 @@ core.listTheTomb = function(tombList)
                         }
                     end
                 )
-				tombYes:register(
-					"help",
-					function(e)
-						local tooltip = tes3ui.createTooltipMenu{item = insidePlayer[tombID]}
-					end)
+                tombYes:register(
+                    "help",
+                    function(e)
+                        local tooltip = tes3ui.createTooltipMenu {item = insidePlayer[tombID]}
+                    end
+                )
 
                 local isInStorage = data.storageCrate.object.inventory:contains(insidePlayer[tombID])
                 local tombLock = tombB:createTextSelect {}
@@ -541,21 +542,21 @@ core.listTheTomb = function(tombList)
                 tombHalf:register(
                     "mouseClick",
                     function()
-						tes3.messageBox("This amulet is placed somewhere..")
-						tes3.playSound {soundPath = ("vo\\misc\\hit heart %s.mp3"):format(math.random(4))}
-						--tes3.playSound {soundPath = ("vo\\misc\\hit heart %s.mp3"):format(math.random(5, 6))}
+                        tes3.messageBox("This amulet is placed somewhere..")
+                        tes3.playSound {soundPath = ("vo\\misc\\hit heart %s.mp3"):format(math.random(4))}
+                        --tes3.playSound {soundPath = ("vo\\misc\\hit heart %s.mp3"):format(math.random(5, 6))}
                     end
                 )
                 tombHalf:register(
                     "mouseOver",
                     function()
                         if tes3.worldController.inputController:isKeyDown(config.hotkeyOpenModifier.keyCode) then
-							local tooltip = tes3ui.createTooltipMenu{item = outsideDummy[tombID]}
-							local divider = tooltip:createDivider {}
-							local label = tooltip:createLabel{text = core.amuletInfoCheat(tombID)}
-							local tooltipsecret = tooltip:createLabel {}
-							tooltipsecret.text = "Press Left Control\nwith Modifier to \ngo to the location"
-							tooltipsecret.font = 2
+                            local tooltip = tes3ui.createTooltipMenu {item = outsideDummy[tombID]}
+                            local divider = tooltip:createDivider {}
+                            local label = tooltip:createLabel {text = core.amuletInfoCheat(tombID)}
+                            local tooltipsecret = tooltip:createLabel {}
+                            tooltipsecret.text = "Press Left Control\nwith Modifier to \ngo to the location"
+                            tooltipsecret.font = 2
                         end
                     end
                 )
@@ -687,7 +688,7 @@ core.showTombList = function(openedFromMCM)
             core.listTheTomb(tombList)
             if successful then
                 tes3.messageBox("All amulets stored")
-				tes3.playSound {sound = "mysticism area", pitch = 1.3}
+                tes3.playSound {sound = "mysticism area", pitch = 1.3}
             end
         end
     )
@@ -710,7 +711,7 @@ core.showTombList = function(openedFromMCM)
             core.listTheTomb(tombList)
             if successful then
                 tes3.messageBox("All amulets returned")
-				tes3.playSound {sound = "mysticism area", pitch = 0.7}
+                tes3.playSound {sound = "mysticism area", pitch = 0.7}
             end
         end
     )
