@@ -1,0 +1,13 @@
+
+
+
+
+New feature: Store amulets: Stored amulets cannot be equipped but its teleportation magic can still be used. Progress bar is unaffected. You can choose to store individual amulets or store all at once.
+
+More interactive table UI and can give hints on amulet location
+
+Removed "little secret" gameplay
+
+Fixed many small bugs from the last version, ensures cleaner log file
+
+Lots of code refactoring
