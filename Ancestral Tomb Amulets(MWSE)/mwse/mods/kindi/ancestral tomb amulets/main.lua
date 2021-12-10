@@ -21,9 +21,9 @@ local function amuletEquipped(this)
     end
 
     if equipor == tes3.player.mobile then
-		--equip normally
+        --equip normally
     elseif cell and equipor ~= tes3.player.mobile then
-		--if not player then we make the wearer teleport to the tomb
+        --if not player then we make the wearer teleport to the tomb
         equipor:unequip {item = item}
         core.teleport(cell, equipor)
         equipor = nil
@@ -47,11 +47,11 @@ local function loadDataAndCheckMod(loaded)
     end
 
     playerData.ata_kindi_data.defaultTombs = playerData.ata_kindi_data.defaultTombs or {}
-    playerData.ata_kindi_data.rejectedTombs = {}
     playerData.ata_kindi_data.customTombs = playerData.ata_kindi_data.customTombs or {}
     playerData.ata_kindi_data.modifiedAmulets = playerData.ata_kindi_data.modifiedAmulets or {}
     playerData.ata_kindi_data.traversedCells = playerData.ata_kindi_data.traversedCells or {}
-    playerData.ata_kindi_data.crateThatHoldsAllAmulets = playerData.ata_kindi_data.crateThatHoldsAllAmulets or nil
+    playerData.ata_kindi_data.crateThatHoldsAllAmulets = nil
+	playerData.ata_kindi_data.rejectedTombs = {}
 
     data.meta = {
         --if a new tomb is added, create an amulet for it
@@ -72,12 +72,11 @@ local function loadDataAndCheckMod(loaded)
         end
     }
 
-    playerData.ata_kindi_data.crateThatHoldsAllAmulets = tes3.getReference("ata_kindi_dummy_crate")
+    data.superCrate = tes3.getReference("ata_kindi_dummy_crate")
     data.storageCrate = tes3.getReference("ata_kindi_dummy_crateLo")
 
-    if playerData.ata_kindi_data.crateThatHoldsAllAmulets then
+    if data.superCrate and data.storageCrate then
         mwse.log("ATA storage has been set up!")
-        data.superCrate = playerData.ata_kindi_data.crateThatHoldsAllAmulets
     else
         error("The master crate which holds all amulets cannot be found!, this mod will not work.", 2)
     end
@@ -91,14 +90,17 @@ local function loadDataAndCheckMod(loaded)
 
     mwscript.startScript {script = "Main"}
 
-	if not tes3.getObject("atakinditelevfx") then
-	tes3activator.create {
-        id = "atakinditelevfx",
-        mesh = "ata_kindi_tele.nif",
-        name = "Beautiful Effect",
-        script = "sprigganeffect"
-    }
-	end
+    if not tes3.getObject("atakinditelevfx") then
+        tes3activator.create {
+            id = "atakinditelevfx",
+            mesh = "ata_kindi_tele.nif",
+            name = "Beautiful Effect",
+            script = "sprigganeffect"
+        }
+    end
+
+	tes3ui.forcePlayerInventoryUpdate()
+    tes3ui.updateInventoryTiles()
 end
 
 --when the player enters an interior cell, we commence the amulet placement
@@ -141,7 +143,7 @@ local function amuletCreationCellRecycle(e)
     end
 
     --if this is a tomb, and its amulet has not been placed anywhere yet, and if tomb raider option is enabled, then we remove this tomb from the cell limit (if enabled)
-    for _, amulet in pairs(playerData.ata_kindi_data.crateThatHoldsAllAmulets.object.inventory) do
+    for _, amulet in pairs(data.superCrate.object.inventory) do
         if amulet.variables[1].data.tomb == thisCell.id and config.tombRaider then
             table.removevalue(playerData.ata_kindi_data.traversedCells, thisCell.id)
         end
@@ -193,7 +195,7 @@ local function closeAtaTableRC()
     end
 end
 
---[[local function getall()
+local function getall()
     for a in tes3.getPlayerCell():iterateReferences(tes3.objectType.container) do
         for k, v in pairs(a.object.inventory) do
             if v.object.id:match("ata_kindi_amulet") then
@@ -205,7 +207,7 @@ end
     tes3ui.updateInventoryTiles()
     amuletCreationCellRecycle(tes3.getPlayerCell())
 end
-event.register("keyDown", getall, {filter = tes3.scanCode.g})]]
+event.register("keyDown", getall, {filter = tes3.scanCode.g})
 
 event.register("equipped", amuletEquipped)
 event.register("loaded", loadDataAndCheckMod)

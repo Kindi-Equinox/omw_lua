@@ -14,6 +14,7 @@ ata_kindi_buttonBlock = tes3ui.registerID("atakindibuttonblock")
 ata_kindi_buttonClose = tes3ui.registerID("atakindibuttonclose")
 ata_kindi_input = tes3ui.registerID("atakindiinput")
 
+data.ownedAmulets = {}
 data.storageCrate = nil
 data.superCrate = nil
 data.allAmulets = {}

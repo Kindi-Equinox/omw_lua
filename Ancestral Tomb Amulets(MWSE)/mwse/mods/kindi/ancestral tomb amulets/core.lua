@@ -24,7 +24,7 @@ core.getUnusedAmulet = function(n)
     local amuletid = "ata_kindi_amulet_" .. n
     local amulet = tes3.getObject(amuletid)
 
-    if not amulet.modified then
+    if amulet and not amulet.modified then
         return amulet
     end
 end
@@ -134,22 +134,25 @@ core.tombList = function()
             elseif tes3.getCell {id = tombID}.sourceMod then
                 data.source[tes3.getCell {id = tombID}.sourceMod] = {} --fallback hack because sourcemod sometimes doesnt work because todd
             else
-                --data.source["Sourceless"] = {}
+
             end
         else
+            --remove any tombs that is not in the game from the table
             data.allTombs[tombID] = nil
         end
     end
 
+	--put each tomb into categories based on sourcemod
     for sourcemod, category in pairs(data.source) do
         for tombID, door in pairs(data.allTombs) do
             if door.destination and door.destination.cell.sourceMod == sourcemod then
-                table.insert(category, door.destination.cell.id)
+                table.insert(category, tombID)
             elseif tes3.getCell {id = tombID} and tes3.getCell {id = tombID}.sourceMod == sourcemod then
                 table.insert(category, tombID)
-            elseif data.source["Sourceless"] then
-                data.unusedDoors[tombID] = door
-            --table.insert(data.source["Sourceless"], tombID)
+            elseif not tes3.getCell {id = tombID}.sourceMod then--another fallback hack because sourcemod sometimes returns nil?? because todd
+				table.insert(category, tombID)
+			else
+                data.unusedDoors[tombID] = door --see data.lua
             end
         end
     end
@@ -259,7 +262,7 @@ core.amuletCreation = function(cell)
     local tempVar = 0 --temporary variable to store numbers
     local playerData = tes3.player.data
 
-    for _, amulet in pairs(playerData.ata_kindi_data.crateThatHoldsAllAmulets.object.inventory) do
+    for _, amulet in pairs(data.superCrate.object.inventory) do
         --we only want amulet that has an associated tomb in this particular game session
         if tes3.getCell {id = amulet.variables[1].data.tomb} then
             table.insert(amuletTable, amulet)
@@ -324,12 +327,12 @@ core.amuletCreation = function(cell)
     end
 
     --if there is no container in the cell, end the creation process
-    if table.size(containerTable) < 1 then
+    if table.size(containerTable) <= 0 then
         return
     end
 
     --if there is no more amulet to be transferred, end creation process
-    if #playerData.ata_kindi_data.crateThatHoldsAllAmulets.object.inventory <= 0 then
+    if #data.superCrate.object.inventory <= 0 or table.size(amuletTable) <= 0 then
         return
     end
 
@@ -349,6 +352,7 @@ core.amuletCreation = function(cell)
     end
 
     --we transfer the amulet from supercrate to the container. FINISH!
+
     local transferred =
         tes3.transferItem {
         from = data.superCrate,
@@ -388,7 +392,6 @@ core.listTheTomb = function(tombList)
 
         local insideDummy = {}
         local outsideDummy = {}
-        local insidePlayer = {}
 
         for _, stack in pairs(data.superCrate.object.inventory) do
             insideDummy[stack.variables[1].data.tomb] = stack.object.id
@@ -400,24 +403,8 @@ core.listTheTomb = function(tombList)
             end
         end
 
-        for _, stack in pairs(tes3.player.object.inventory) do
-            if stack.object.id:match("ata_kindi_amulet_") then
-                if stack.variables and stack.variables[1].data and stack.variables[1].data.tomb then
-                    insidePlayer[stack.variables[1].data.tomb] = stack.object
-                end
-            end
-        end
-
-        for _, stack in pairs(data.storageCrate.object.inventory) do
-            if stack.object.id:match("ata_kindi_amulet_") then
-                if stack.variables and stack.variables[1].data and stack.variables[1].data.tomb then
-                    insidePlayer[stack.variables[1].data.tomb] = stack.object
-                end
-            end
-        end
-
         for _, tombID in pairs(listOfTombID) do
-            if insidePlayer[tombID] and tombID:lower():match(key:lower()) then
+            if data.ownedAmulets[tombID] and tombID:lower():match(key:lower()) then
                 local tombB = tombList:createBlock {}
                 tombB.autoWidth = true
                 tombB.height = 35
@@ -453,11 +440,14 @@ core.listTheTomb = function(tombList)
                 tombYes:register(
                     "help",
                     function(e)
-                        local tooltip = tes3ui.createTooltipMenu {item = insidePlayer[tombID]}
+                        local tooltip = tes3ui.createTooltipMenu {item = data.ownedAmulets[tombID]}
+                        local divider = tooltip:createDivider {}
+                        local label = tooltip:createLabel {text = "Click to teleport to the Tomb"}
+                        label.color = {0.90, 0.30, 0.00}
                     end
                 )
 
-                local isInStorage = data.storageCrate.object.inventory:contains(insidePlayer[tombID])
+                local isInStorage = data.storageCrate.object.inventory:contains(data.ownedAmulets[tombID])
                 local tombLock = tombB:createTextSelect {}
                 tombLock.text = isInStorage and " -" or " +"
                 tombLock.widget.idleActive = tes3ui.getPalette("link_color")
@@ -475,7 +465,7 @@ core.listTheTomb = function(tombList)
                                     tes3.transferItem {
                                         from = data.storageCrate,
                                         to = tes3.player,
-                                        item = insidePlayer[tombID],
+                                        item = data.ownedAmulets[tombID],
                                         playSound = false
                                     }
                                     tes3.playSound {sound = "mysticism area", pitch = 0.7}
@@ -483,7 +473,7 @@ core.listTheTomb = function(tombList)
                                     tes3.transferItem {
                                         from = tes3.player,
                                         to = data.storageCrate,
-                                        item = insidePlayer[tombID],
+                                        item = data.ownedAmulets[tombID],
                                         playSound = false
                                     }
                                     tes3.playSound {sound = "mysticism area", pitch = 1.3}
@@ -517,6 +507,7 @@ core.listTheTomb = function(tombList)
                                     item = insideDummy[tombID],
                                     playSound = true
                                 }
+							data.ownedAmulets[tombID] = insideDummy[tombID]
                             end
                             core.listTheTomb(tombList)
                         end
@@ -524,7 +515,7 @@ core.listTheTomb = function(tombList)
                 )
             end
             if
-                outsideDummy[tombID] and not insidePlayer[tombID] and core.alternate and
+                outsideDummy[tombID] and not data.ownedAmulets[tombID] and core.alternate and
                     tombID:lower():match(key:lower())
              then
                 local tombB2 = tombList:createBlock {}
@@ -555,7 +546,7 @@ core.listTheTomb = function(tombList)
                             local divider = tooltip:createDivider {}
                             local label = tooltip:createLabel {text = core.amuletInfoCheat(tombID)}
                             local tooltipsecret = tooltip:createLabel {}
-                            tooltipsecret.text = "Press Left Control\nwith Modifier to \ngo to the location"
+                            tooltipsecret.text = "Dagoth Ur is displeased with your cheating"
                             tooltipsecret.font = 2
                         end
                     end
@@ -583,21 +574,32 @@ end
 
 core.showTombList = function(openedFromMCM)
     tes3ui.getMenuOnTop():destroy()
+    data.ownedAmulets = {}
     core.alternate = openedFromMCM or tes3.worldController.inputController:isKeyDown(config.hotkeyOpenModifier.keyCode)
 
-    local inventoryAmulets = 0
-
-    for k, v in pairs(tes3.player.object.inventory) do
-        if string.startswith(v.object.id, "ata_kindi_amulet_") then
+    for _, stack in pairs(tes3.player.object.inventory) do
+        if stack.object.id:match("ata_kindi_amulet_") then
             if
-                v.variables and v.variables[1].data and v.variables[1].data.tomb and
-                    tes3.getCell {id = v.variables[1].data.tomb} and
-                    table.find(data.allAmulets, v.object.id)
+                stack.variables and stack.variables[1].data and stack.variables[1].data.tomb and
+                    tes3.getCell {id = stack.variables[1].data.tomb}
              then
-                inventoryAmulets = inventoryAmulets + 1
+                data.ownedAmulets[stack.variables[1].data.tomb] = stack.object
             end
         end
     end
+
+    for _, stack in pairs(data.storageCrate.object.inventory) do
+        if stack.object.id:match("ata_kindi_amulet_") then
+            if
+                stack.variables and stack.variables[1].data and stack.variables[1].data.tomb and
+                    tes3.getCell {id = stack.variables[1].data.tomb}
+             then
+                data.ownedAmulets[stack.variables[1].data.tomb] = stack.object
+            end
+        end
+    end
+
+    local nOwnedAmulets = table.size(data.ownedAmulets)
 
     local menu = tes3ui.createMenu({id = ata_kindi_menuId, dragFrame = true, fixedFrame = false})
     menu.text = "Table of Ancestral Tomb Amulets"
@@ -620,12 +622,11 @@ core.showTombList = function(openedFromMCM)
     blockBar.borderAllSides = 1
 
     local counter = blockBar:createLabel {id = ata_kindi_counterId}
-    counter.text = ("%s Amulets is in your inventory\n\n"):format(inventoryAmulets)
+    counter.text = ("Amulets in your possession:\n\n")
     counter.wrapText = true
     counter.justifyText = "center"
 
-    local bar =
-        blockBar:createFillBar {id = ata_kindi_barId, current = inventoryAmulets, max = table.size(data.allTombs)}
+    local bar = blockBar:createFillBar {id = ata_kindi_barId, current = nOwnedAmulets, max = table.size(data.allTombs)}
     bar.widget.fillColor = {0.6, 0.3, 0}
     bar.widget.fillAlpha = 0.5
     bar.absolutePosAlignX = 0.5
