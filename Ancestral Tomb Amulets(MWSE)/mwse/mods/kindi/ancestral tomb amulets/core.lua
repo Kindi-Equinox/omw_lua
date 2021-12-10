@@ -134,7 +134,6 @@ core.tombList = function()
             elseif tes3.getCell {id = tombID}.sourceMod then
                 data.source[tes3.getCell {id = tombID}.sourceMod] = {} --fallback hack because sourcemod sometimes doesnt work because todd
             else
-
             end
         else
             --remove any tombs that is not in the game from the table
@@ -142,16 +141,16 @@ core.tombList = function()
         end
     end
 
-	--put each tomb into categories based on sourcemod
+    --put each tomb into categories based on sourcemod
     for sourcemod, category in pairs(data.source) do
         for tombID, door in pairs(data.allTombs) do
             if door.destination and door.destination.cell.sourceMod == sourcemod then
                 table.insert(category, tombID)
             elseif tes3.getCell {id = tombID} and tes3.getCell {id = tombID}.sourceMod == sourcemod then
                 table.insert(category, tombID)
-            elseif not tes3.getCell {id = tombID}.sourceMod then--another fallback hack because sourcemod sometimes returns nil?? because todd
-				table.insert(category, tombID)
-			else
+            elseif not tes3.getCell {id = tombID}.sourceMod then --another fallback hack because sourcemod sometimes returns nil?? because todd
+                table.insert(category, tombID)
+            else
                 data.unusedDoors[tombID] = door --see data.lua
             end
         end
@@ -507,7 +506,7 @@ core.listTheTomb = function(tombList)
                                     item = insideDummy[tombID],
                                     playSound = true
                                 }
-							data.ownedAmulets[tombID] = insideDummy[tombID]
+                                data.ownedAmulets[tombID] = insideDummy[tombID]
                             end
                             core.listTheTomb(tombList)
                         end

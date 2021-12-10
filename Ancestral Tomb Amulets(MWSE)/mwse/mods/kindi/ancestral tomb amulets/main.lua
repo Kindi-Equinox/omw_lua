@@ -51,7 +51,7 @@ local function loadDataAndCheckMod(loaded)
     playerData.ata_kindi_data.modifiedAmulets = playerData.ata_kindi_data.modifiedAmulets or {}
     playerData.ata_kindi_data.traversedCells = playerData.ata_kindi_data.traversedCells or {}
     playerData.ata_kindi_data.crateThatHoldsAllAmulets = nil
-	playerData.ata_kindi_data.rejectedTombs = {}
+    playerData.ata_kindi_data.rejectedTombs = {}
 
     data.meta = {
         --if a new tomb is added, create an amulet for it
@@ -99,7 +99,7 @@ local function loadDataAndCheckMod(loaded)
         }
     end
 
-	tes3ui.forcePlayerInventoryUpdate()
+    tes3ui.forcePlayerInventoryUpdate()
     tes3ui.updateInventoryTiles()
 end
 
